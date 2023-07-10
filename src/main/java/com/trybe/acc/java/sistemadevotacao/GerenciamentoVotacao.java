@@ -6,62 +6,91 @@ import java.util.ArrayList;
  * Classe que gerência a votação.
  */
 public class GerenciamentoVotacao {
-  private ArrayList<PessoaCandidata> pessoasCandidatas;
-  private ArrayList<PessoaEleitora> pessoasEleitoras;
-  private ArrayList<String> cpfComputado;
-  private int totalVotos;
+  private ArrayList<PessoaCandidata> pessoasCandidatas = new ArrayList<PessoaCandidata>();
+  private ArrayList<PessoaEleitora> pessoasEleitoras = new ArrayList<PessoaEleitora>();
+  private ArrayList<String> cpfComputado = new ArrayList<String>();
+  private int totalVotos = 0;
 
   /**
    * Método para cadastrar pessoa candidata.
    */
   public void cadastrarPessoaCandidata(String nome, int numero) {
-    for (int i = 0; i < pessoasCandidatas.size(); i++) {
-      PessoaCandidata candidatoCadastrado = pessoasCandidatas.get(i);
+    for (PessoaCandidata candidatoCadastrado : pessoasCandidatas) {
       int numeroCandidatoCadastrado = candidatoCadastrado.getNumero();
       if (numeroCandidatoCadastrado == numero) {
         System.out.println("Número pessoa candidata já utilizado!");
-      } else {
-        PessoaCandidata novoCandidato = new PessoaCandidata(nome, numero);
-        pessoasCandidatas.add(novoCandidato);
+        return;
       }
     }
+
+    PessoaCandidata novoCandidato = new PessoaCandidata(nome, numero);
+    pessoasCandidatas.add(novoCandidato);
+    System.out.println(pessoasCandidatas);
+  }
+
+
+
+  /**
+   * Método para verificar se eleitor já foi cadastrado.
+   */
+  public boolean verificarCadastroEleitor(String cpfEleitor) {
+    for (PessoaEleitora eleitor : pessoasEleitoras) {
+      String cpf = eleitor.getCpf();
+      if (cpf.equals(cpfEleitor)) {
+        System.out.println("Pessoa eleitora já cadastrada!");
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
    * Método para cadastrar pessoa eleitora.
    */
   public void cadastrarPessoaEleitora(String nome, String cpf) {
-    for (int i = 0; i < pessoasEleitoras.size(); i++) {
-      PessoaEleitora eleitorCadastrado = pessoasEleitoras.get(i);
-      String cpfEleitorCadastrado = eleitorCadastrado.getCpf();
-      if (cpfEleitorCadastrado == cpf) {
-        System.out.println("Pessoa eleitora já cadastrada!");
-      } else {
-        PessoaEleitora novoEleitor = new PessoaEleitora(nome, cpf);
-        pessoasEleitoras.add(novoEleitor);
+    boolean jaVotou = verificarCadastroEleitor(cpf);
+    if (!jaVotou) {
+      PessoaEleitora novoEleitor = new PessoaEleitora(nome, cpf);
+      pessoasEleitoras.add(novoEleitor);
+    }
+    return;
+  }
+
+  /**
+   * Verifica se pessoa já votou.
+   */
+  public boolean verificarSeCpfJaVotou(String cpfPessoaEleitora) {
+    for (String cpf : cpfComputado) {
+      if (cpf.equals(cpfPessoaEleitora)) {
+        System.out.println("Pessoa eleitora já votou!");
+
+        return true;
       }
     }
+    return false;
   }
 
   /**
    * Método para votar.
    */
   public void votar(String cpfPessoaEleitora, int numeroPessoaCandidata) {
-    for (int i = 0; i < cpfComputado.size(); i++) {
-      if (cpfComputado.get(i) == cpfPessoaEleitora) {
-        System.out.println("Pessoa eleitora já votou!");
-      } else {
-        for (int j = 0; j < pessoasCandidatas.size(); i++) {
-          PessoaCandidata candidatoCadastrado = pessoasCandidatas.get(j);
-          int numeroCandidatoCadastrado = candidatoCadastrado.getNumero();
-          if (numeroCandidatoCadastrado == numeroPessoaCandidata) {
-            candidatoCadastrado.receberVoto();
-            cpfComputado.add(cpfPessoaEleitora);
-          }
+
+    for (PessoaCandidata candidatoCadastrado : pessoasCandidatas) {
+      boolean jaVotou = verificarSeCpfJaVotou(cpfPessoaEleitora);
+      if (!jaVotou) {
+        int numeroCandidatoCadastrado = candidatoCadastrado.getNumero();
+        if (numeroCandidatoCadastrado == numeroPessoaCandidata) {
+          candidatoCadastrado.receberVoto();
+          cpfComputado.add(cpfPessoaEleitora);
+          this.totalVotos += 1;
+          return;
         }
       }
     }
+    System.out.println("Número da pessoa candidata não encontrado!");
   }
+
+
 
   /**
    * Método para mostrar resultado.
