@@ -67,24 +67,27 @@ public class Principal {
       System.out.println("2 - Resultado Parcial");
       System.out.println("3 - Finalizar Votação");
       opcao = scanner.nextInt();
-      scanner.nextLine();
 
       switch (opcao) {
         case 1:
           System.out.print("Entre com o CPF da pessoa eleitora: ");
           String cpfEleitora = scanner.nextLine();
 
-          System.out.print("Entre com o número da pessoa candidata: ");
-          int numeroCandidata = scanner.nextInt();
-          scanner.nextLine();
+          boolean jaVotou = votacao.verificarSeCpfJaVotou(cpfEleitora);
+          if (!jaVotou) {
+            System.out.print("Entre com o número da pessoa candidata: ");
+            int numeroCandidata = scanner.nextInt();
+            scanner.nextLine();
 
-          votacao.votar(cpfEleitora, numeroCandidata);
+            votacao.votar(cpfEleitora, numeroCandidata);
+          }
           break;
         case 2:
           votacao.mostrarResultado();
           break;
         case 3:
           System.out.println("Votação finalizada!");
+          votacao.mostrarResultado();
           break;
         default:
           System.out.println("Opção inválida!");
